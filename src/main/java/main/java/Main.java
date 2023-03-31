@@ -33,16 +33,27 @@ public class Main {
         }
 
         //
+        String textFromPdf = null;
         String path = "src/main/resources/temp/report-2d8a0d89-8e56-41b5-a941-5647c07a062d-OfSite-2023-02-22-1494271-78-01[0].pdf";
         PDDocument document = PDDocument.load(new File(path));
         if (!document.isEncrypted()) {
             PDFTextStripper stripper = new PDFTextStripper();
-            String text = stripper.getText(document);
-                System.out.println("Text:" + text);
-
+            textFromPdf = stripper.getText(document);
         }
         document.close();
 
+
+        // получить номер квартиры
+        String adress = "Местоположение: Санкт-Петербург, ул. Кузнецовская, д. 10, литера. А, кв. ";
+        String numberOfFlat = "";
+
+            final String[] content = textFromPdf.split("\n");
+            for (String lineFromString : content) {
+                if (lineFromString.contains(adress)){
+                    numberOfFlat = lineFromString.substring(adress.length());
+                    System.out.println("Номер квартиры: " + numberOfFlat);
+                }
+            }
 
     }
 }
