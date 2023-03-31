@@ -5,16 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- идентификаторы и версия пакета -->
-    <groupId>ru.yandex.practicum</groupId>
-    <artifactId>hellо-maven</artifactId>
+    <groupId>ru.yandex.olganow</groupId>
+    <artifactId>register_from_archive</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <!-- блок параметров проекта -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+        <!-- release - за счёт этого параметра система сборки поймёт, какую целевую платформу указать компилятору. -->
         <maven.compiler.release>11</maven.compiler.release>
+        <!-- source этот параметр будет указывать на то, что исходный код проекта будет написан с использованием возможностей Java 11. -->
         <maven.compiler.source>11</maven.compiler.source>
+        <!-- target - так задаётся версия языка, под которую должен быть скомпилирован код проекта. -->
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
