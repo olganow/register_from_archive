@@ -1,15 +1,24 @@
 package main.java;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 public class XMLParser {
-    private  ArrayList<Person> owners = new ArrayList<>();
+    private List<Owner> owners = new ArrayList<>();
     private int appNumber;
+    private double area;
+
+    public List<Owner> getOwners() {
+        return owners;
+    }
 
     public void xmlParser(String path) {
         try {
@@ -18,17 +27,18 @@ public class XMLParser {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(inputFile);
             doc.getDocumentElement().normalize();
-            System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+            //      System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
             NodeList nList = doc.getElementsByTagName("room_record");
-            System.out.println("----------------------------");
+            //   System.out.println("----------------------------");
 
             for (int temp = 0; temp < nList.getLength(); temp++) {
                 Node nNode = nList.item(temp);
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+                //     System.out.println("\nCurrent Element :" + nNode.getNodeName());
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     appNumber = Integer.parseInt(eElement.getElementsByTagName("name_apartment").item(0).getTextContent());
+                    area = Double.parseDouble(eElement.getElementsByTagName("area").item(0).getTextContent());
                 }
 
 
@@ -43,25 +53,33 @@ public class XMLParser {
                     String userName;
                     String userNPatronymic;
                     Node node = nodeList.item(i);
-                    System.out.println("\nNode Name :" + node.getNodeName());
+                    //     System.out.println("\nNode Name :" + node.getNodeName());
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         Element tElement = (Element) node;
                         shareInFlat = tElement.getElementsByTagName("share_description").item(0).getTextContent();
                         userSurname = tElement.getElementsByTagName("surname").item(0).getTextContent();
                         userName = tElement.getElementsByTagName("name").item(0).getTextContent();
                         userNPatronymic = tElement.getElementsByTagName("patronymic").item(0).getTextContent();
-                        owners.add(new Person(userSurname, userName, userNPatronymic, shareInFlat, appNumber));
+                        Owner owner = new Owner(userSurname, userName, userNPatronymic, shareInFlat, appNumber, area);
+                        //todo
+                        if (owners.contains(owner)) {
+                            String newShareInFlat = owner.getShareInFlat() + shareInFlat;
+                            owners.add(new Owner(userSurname, userName, userNPatronymic, newShareInFlat, appNumber, area));
+                        } else {
+                            owners.add(owner);
+                        }
                     }
                 }
 
                 // Вывод информации о каждом собственнике
-                for (Person person : owners) {
+                for (Owner person : owners) {
                     System.out.println(person);
                 }
-
             }
-        } catch (Exception e) {
+        } catch (SaveException e) {
             e.printStackTrace();
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package main.java;
 
 import java.io.*;
-
+import java.util.List;
 
 
 public class Main {
@@ -13,12 +13,9 @@ public class Main {
 
         InMemoryArchive inMemoryArchive = new InMemoryArchive();
         XMLParser xmlParser = new XMLParser();
-        inMemoryArchive.getFileName(zipPackagePath,partOfName);
-        xmlParser.xmlParser(pathFileToBeParsed );
-
-
-
-
-
-
-}}
+        inMemoryArchive.getFileName(zipPackagePath, partOfName);
+        xmlParser.xmlParser(pathFileToBeParsed);
+        List<Owner> owners = xmlParser.getOwners();
+        inMemoryArchive.save(owners);
+    }
+}
