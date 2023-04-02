@@ -4,11 +4,11 @@ public class Owner {
     private String surname;
     private String name;
     private String patronymic;
-    private String shareInFlat;
+    private double shareInFlat;
     private int flatNumber;
     private double area;
 
-    public Owner(String surname, String name, String patronymic, String shareInFlat, int flatNumber, double area) {
+    public Owner(String surname, String name, String patronymic, double shareInFlat, int flatNumber, double area) {
         this.surname = surname;
         this.name = name;
         this.patronymic = patronymic;
@@ -25,7 +25,7 @@ public class Owner {
         return name;
     }
 
-    public void setShareInFlat(String shareInFlat) {
+    public void setShareInFlat(double shareInFlat) {
         this.shareInFlat = shareInFlat;
     }
 
@@ -33,7 +33,7 @@ public class Owner {
         return patronymic;
     }
 
-    public String getShareInFlat() {
+    public double getShareInFlat() {
         return shareInFlat;
     }
 

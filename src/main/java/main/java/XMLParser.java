@@ -2,6 +2,7 @@ package main.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,7 +49,7 @@ public class XMLParser {
                 // Iterate through all the nodes in NodeList
                 // using for loop.
                 for (int i = 0; i < nodeList.getLength(); ++i) {
-                    String shareInFlat;
+                    double shareInFlat;
                     String userSurname;
                     String userName;
                     String userNPatronymic;
@@ -56,17 +57,29 @@ public class XMLParser {
                     //     System.out.println("\nNode Name :" + node.getNodeName());
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         Element tElement = (Element) node;
-                        shareInFlat = tElement.getElementsByTagName("share_description").item(0).getTextContent();
+
+                        shareInFlat = NumberUtils.fractionToDouble(tElement.getElementsByTagName("share_description").item(0).getTextContent());
                         userSurname = tElement.getElementsByTagName("surname").item(0).getTextContent();
                         userName = tElement.getElementsByTagName("name").item(0).getTextContent();
                         userNPatronymic = tElement.getElementsByTagName("patronymic").item(0).getTextContent();
                         Owner owner = new Owner(userSurname, userName, userNPatronymic, shareInFlat, appNumber, area);
-                        //todo
-                        if (owners.contains(owner)) {
-                            String newShareInFlat = owner.getShareInFlat() + shareInFlat;
-                            owners.add(new Owner(userSurname, userName, userNPatronymic, newShareInFlat, appNumber, area));
-                        } else {
+                        if (owners.isEmpty()) {
                             owners.add(owner);
+                        } else {
+                            //Проверка того, что если в рееестре собственник повторяется - то его доли складываются
+                            for (Owner ownerFromlist : owners) {
+                                if (ownerFromlist.getName().equals(userName) &&
+                                        ownerFromlist.getSurname().equals(userSurname) &&
+                                        ownerFromlist.getPatronymic().equals(userNPatronymic)) {
+                                    double newShareInFlat = ownerFromlist.getShareInFlat() + shareInFlat;
+                                    owners.remove(ownerFromlist);
+                                    owners.add(new Owner(userSurname, userName, userNPatronymic, newShareInFlat, appNumber, area));
+                                    break;
+                                } else {
+                                    owners.add(owner);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -78,7 +91,7 @@ public class XMLParser {
             }
         } catch (SaveException e) {
             e.printStackTrace();
-        } catch (ParserConfigurationException | IOException | SAXException e) {
+        } catch (ParserConfigurationException | IOException | SAXException | ParseException e) {
             throw new RuntimeException(e);
         }
     }
