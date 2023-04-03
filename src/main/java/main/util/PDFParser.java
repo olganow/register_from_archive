@@ -1,5 +1,6 @@
-package main.java;
+package main.util;
 
+import main.java.Owner;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 

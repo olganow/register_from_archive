@@ -1,4 +1,4 @@
-package main.java;
+package main.util;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -18,8 +18,7 @@ public class NumberUtils {
                     BigDecimal response = d1.divide(d2, MathContext.DECIMAL128);
                     d = response.doubleValue();
                 }
-            }
-            else {
+            } else {
                 d = Double.valueOf(fraction);
             }
         }

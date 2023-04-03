@@ -1,9 +1,9 @@
 package main.java;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import main.util.SaveException;
+import main.util.XMLParser;
+
+import java.io.*;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -12,10 +12,32 @@ import java.util.zip.ZipFile;
 public class InMemoryArchive {
     // private final File historyFile;
     private static final String TITLE_LINE = "номер_кв, доля, площадь_кв, фамилия,имя,отчество\n";
+    private static String pathToFolderWithRawData = "src/main/resources/raw_data";
+    private static File ownersFile = new File("src/main/resources/owners.csv");
+    private static String partOfName = "[0].xml";
 
-    File ownersFile = new File("src/main/resources/owners.csv");
+    XMLParser xmlParser = new XMLParser();
 
-    public String getFileName(String zipPackagePath, String partOfName) throws IOException {
+    //перебор по папке с необработанными архивами
+    public void getFileFromZips() {
+        File path = new File(pathToFolderWithRawData);
+
+        File[] files = path.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile()) { //this line weeds out other directories/folders
+                System.out.println(files[i]);
+                try {
+                    getFileName(files[i].getPath());
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    //определение файла xml
+    public String getFileName(String zipPackagePath) throws IOException {
         String fileToBeExtracted = "";
         ZipFile zipFile = new ZipFile(zipPackagePath);
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -26,11 +48,12 @@ public class InMemoryArchive {
             // 1. Найти нужный файл в архиве
             if (entryName.endsWith(partOfName)) {
                 fileToBeExtracted = entryName;
+                System.out.println(entryName);////
             }
         }
-
         return fileToBeExtracted;
     }
+
 
     protected void save(List<Owner> owners) {
         try (Writer fileWriter = new FileWriter(ownersFile)) {

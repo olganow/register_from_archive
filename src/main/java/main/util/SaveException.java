@@ -1,4 +1,4 @@
-package main.java;
+package main.util;
 
 public class SaveException extends RuntimeException {
 
