@@ -22,6 +22,10 @@ public class XMLParser {
         return owners;
     }
 
+    public int getAppNumber() {
+        return appNumber;
+    }
+
     public void xmlParser(String path) {
         try {
             File inputFile = new File(path);
