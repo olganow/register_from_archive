@@ -43,8 +43,6 @@ public class XMLParser {
                     area = Double.parseDouble(eElement.getElementsByTagName("area").item(0).getTextContent());
                 }
 
-                if (doc.getElementsByTagName("right_record").equals("right_record")) {
-                    // Here nodeList contains all the nodes with name individual
                     NodeList nodeList = doc.getElementsByTagName("right_record");
 
                     // Iterate through all the nodes in NodeList
@@ -84,8 +82,7 @@ public class XMLParser {
                             }
                         }
                     }
-                } else {
-                    //если в документе нет информации о собственнике
+                if (owners.isEmpty()) {
                     owners.add(new Owner(null, null, null, 0, appNumber, area));
                 }
 
@@ -100,5 +97,6 @@ public class XMLParser {
         } catch (ParserConfigurationException | IOException | SAXException | ParseException e) {
             throw new RuntimeException(e);
         }
+
     }
 }

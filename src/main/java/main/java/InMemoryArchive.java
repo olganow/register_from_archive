@@ -25,26 +25,30 @@ public class InMemoryArchive {
 
     //перебор по папке с необработанными архивами
     public void getFileFromZips() {
+        XMLParser xmlParser = new XMLParser();
         File path = new File(INPUT_FOLDER_ZIP_FILES);
-
         File[] files = path.listFiles();
         for (int i = 0; i < files.length; i++) {
             if (files[i].isFile()) { //this line weeds out other directories/folders
                 System.out.println("имя архива: " + files[i]);
                 try {
                     String getFileNameToBeParsed = getFileName(files[i].getPath());
+
+                    //распаковка архива
                     unzipFolder(Path.of(String.valueOf(files[i])), Path.of(TEMP_FOLDER));
                     String pathFileToBeParsed = TEMP_FOLDER + "/" + getFileNameToBeParsed;
 
                     // прочитать файл с определенным именем и получить номер квартиры
-                    XMLParser xmlParser = new XMLParser();
                     xmlParser.xmlParser(pathFileToBeParsed);
                     int appNumber = xmlParser.getAppNumber();
+                    save(xmlParser.getOwners());
 
                     //перемещение
                     String pathFileToRemovedFile = TEMP_FOLDER + "/" + appNumber + ".xml";
                     renameFile(pathFileToBeParsed, pathFileToRemovedFile);
-                    String checkedFileName = checkCreatedFileName(pathFileToRemovedFile, appNumber);
+ //                   String checkedFileName = checkCreatedFileName(pathFileToRemovedFile, appNumber);
+ //                   removeFile(pathFileToRemovedFile, checkedFileName);
+                    String checkedFileName = appNumber + ".xml";
                     removeFile(pathFileToRemovedFile, checkedFileName);
 
                     //очистка временной папки
@@ -86,11 +90,6 @@ public class InMemoryArchive {
             while (zipEntry != null) {
 
                 boolean isDirectory = false;
-                // example 1.1
-                // some zip stored files and folders separately
-                // e.g data/
-                //     data/folder/
-                //     data/folder/file.txt
                 if (zipEntry.getName().endsWith(File.separator)) {
                     isDirectory = true;
                 }
@@ -100,10 +99,6 @@ public class InMemoryArchive {
                 if (isDirectory) {
                     Files.createDirectories(newPath);
                 } else {
-
-                    // example 1.2
-                    // some zip stored file path only, need create parent directories
-                    // e.g data/folder/file.txt
                     if (newPath.getParent() != null) {
                         if (Files.notExists(newPath.getParent())) {
                             Files.createDirectories(newPath.getParent());
@@ -112,15 +107,6 @@ public class InMemoryArchive {
 
                     // copy files, nio
                     Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
-
-                    // copy files, classic
-                    /*try (FileOutputStream fos = new FileOutputStream(newPath.toFile())) {
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        while ((len = zis.read(buffer)) > 0) {
-                            fos.write(buffer, 0, len);
-                        }
-                    }*/
                 }
 
                 zipEntry = zis.getNextEntry();
@@ -136,13 +122,8 @@ public class InMemoryArchive {
     public static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir)
             throws IOException {
 
-        // test zip slip vulnerability
-        // Path targetDirResolved = targetDir.resolve("../../" + zipEntry.getName());
-
         Path targetDirResolved = targetDir.resolve(zipEntry.getName());
 
-        // make sure normalized file still has targetDir as its prefix
-        // else throws exception
         Path normalizePath = targetDirResolved.normalize();
         if (!normalizePath.startsWith(targetDir)) {
             throw new IOException("Bad zip entry: " + zipEntry.getName());
